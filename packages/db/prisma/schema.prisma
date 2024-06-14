@@ -1,0 +1,66 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         Int         @id @default(autoincrement())
+  email      String      @unique
+  name       String
+  password   String
+  wallets    UserWallet[]
+  donations  Donation[]
+}
+
+model UserWallet {
+  id      Int    @id @default(autoincrement())
+  address String
+  userId  Int
+  user    User   @relation(fields: [userId], references: [id])
+}
+
+model Org {
+  id            Int         @id @default(autoincrement())
+  email         String      @unique
+  totalDonation Float       @default(0)
+  name          String
+  password      String
+  wallets       OrgWallet[]
+  posts         Post[]
+  donations     Donation[]
+}
+
+model OrgWallet {
+  id      Int    @id @default(autoincrement())
+  address String
+  orgId   Int
+  org     Org    @relation(fields: [orgId], references: [id])
+}
+
+model Post {
+  id            Int         @id @default(autoincrement())
+  title         String
+  content       String
+  publishedOn   DateTime
+  publishedBy   String
+  totalDonation Float       @default(0)
+  orgId         Int
+  org           Org         @relation(fields: [orgId], references: [id])
+  donations     Donation[]
+}
+
+model Donation {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  orgId     Int
+  org       Org      @relation(fields: [orgId], references: [id])
+  postId    Int?
+  post      Post?    @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now())
+}
