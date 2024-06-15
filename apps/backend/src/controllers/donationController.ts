@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
-import { prisma } from '../utils/prisma';
+import { PrismaClient } from '@prisma/client';
 import { donateToOrg } from '../utils/stellarUtils';
+
+const prisma = new PrismaClient();
 
 export const processDonation = async (req: Request, res: Response) => {
   const { userId, orgId, amount } = req.body;

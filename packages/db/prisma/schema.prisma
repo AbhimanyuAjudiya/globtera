@@ -6,13 +6,12 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
-
 model User {
   id         Int         @id @default(autoincrement())
   email      String      @unique
   name       String
   password   String
-  walletAddress String 
+  walletAddress String
   donations  Donation[]
 }
 
@@ -22,7 +21,7 @@ model Org {
   totalDonation Float       @default(0)
   name          String
   password      String
-  walletAddress String 
+  walletAddress String
   posts         Post[]
   donations     Donation[]
 }

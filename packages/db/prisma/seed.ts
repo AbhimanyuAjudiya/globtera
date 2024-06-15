@@ -1,110 +1,85 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  // Hash passwords
+  const hashedPasswordUser1 = await bcrypt.hash('password123', 10);
+  const hashedPasswordUser2 = await bcrypt.hash('password456', 10);
+  const hashedPasswordOrg1 = await bcrypt.hash('password789', 10);
+  const hashedPasswordOrg2 = await bcrypt.hash('password101', 10);
+
   // Create users
   const user1 = await prisma.user.create({
     data: {
       email: 'user1@example.com',
       name: 'User One',
-      password: 'password123', // Note: This is just an example, in practice, hash passwords
-      wallets: {
-        create: [
-          { address: 'wallet_address_1' },
-          { address: 'wallet_address_2' }
-        ]
-      }
-    }
+      password: hashedPasswordUser1,
+      walletAddress: 'user1-wallet-address',
+    },
   });
 
   const user2 = await prisma.user.create({
     data: {
       email: 'user2@example.com',
       name: 'User Two',
-      password: 'password456',
-      wallets: {
-        create: [
-          { address: 'wallet_address_3' }
-        ]
-      }
-    }
+      password: hashedPasswordUser2,
+      walletAddress: 'user2-wallet-address',
+    },
   });
 
   // Create organizations
   const org1 = await prisma.org.create({
     data: {
       email: 'org1@example.com',
-      name: 'Organization One',
-      password: 'orgpassword123',
-      wallets: {
-        create: [
-          { address: 'org_wallet_address_1' }
-        ]
-      }
-    }
+      name: 'Org One',
+      password: hashedPasswordOrg1,
+      walletAddress: 'org1-wallet-address',
+      totalDonation: 0,
+    },
   });
 
   const org2 = await prisma.org.create({
     data: {
       email: 'org2@example.com',
-      name: 'Organization Two',
-      password: 'orgpassword456',
-      wallets: {
-        create: [
-          { address: 'org_wallet_address_2' }
-        ]
-      }
-    }
+      name: 'Org Two',
+      password: hashedPasswordOrg2,
+      walletAddress: 'org2-wallet-address',
+      totalDonation: 0,
+    },
   });
 
   // Create posts
   const post1 = await prisma.post.create({
     data: {
-      title: 'First Post',
+      title: 'Post One',
       content: 'Content of the first post.',
       publishedOn: new Date(),
-      publishedBy: user1.name,
-      orgId: org1.id
-    }
+      publishedBy: 'User One',
+      orgId: org1.id,
+    },
   });
 
   const post2 = await prisma.post.create({
     data: {
-      title: 'Second Post',
+      title: 'Post Two',
       content: 'Content of the second post.',
       publishedOn: new Date(),
-      publishedBy: user2.name,
-      orgId: org2.id
-    }
-  });
-
-  // Create donations
-  await prisma.donation.create({
-    data: {
-      amount: 100,
-      userId: user1.id,
-      orgId: org1.id,
-      postId: post1.id
-    }
-  });
-
-  await prisma.donation.create({
-    data: {
-      amount: 50,
-      userId: user2.id,
+      publishedBy: 'User Two',
       orgId: org2.id,
-      postId: post2.id
-    }
+    },
   });
 
-  console.log('Seed data populated successfully');
+  console.log({ user1, user2, org1, org2, post1, post2 });
 }
 
 main()
+  .then(() => {
+    console.log('Seed data created successfully');
+  })
   .catch((e) => {
-    console.error(e);
-    process.exit(1);
+    console.error('Error creating seed data:', e);
   })
   .finally(async () => {
     await prisma.$disconnect();

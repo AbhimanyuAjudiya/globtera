@@ -3,10 +3,10 @@ export const Quote = () => {
         <div className="flex justify-center">
             <div className=" max-w-lg ">
                 <div className="text-3xl font-bold">
-                    "The art of writing is the art of discovering what you believe."
+                    "We make a living by what we get, but we make a life by what we give."
                 </div>    
                 <div className=" font-semibold mt-1">
-                    - Gustave Flaubert
+                    - Winston Churchill
                 </div>
             </div>
         </div>
