@@ -1,9 +1,14 @@
 import { Router } from 'express';
-import { registerOrg, authOrg, getAllOrgs } from '../controllers/orgController';
+import { registerOrg, authOrg, getAllOrgs, createPost, getAllPosts, getPostById } from '../controllers/orgController';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
 router.post('/register', registerOrg);
 router.post('/auth', authOrg);
 router.get('/all', getAllOrgs);
+router.post('/post', createPost);
+router.get('/posts', getAllPosts);
+router.get('/posts/:id', getPostById);
+
 export default router;

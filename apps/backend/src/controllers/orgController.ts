@@ -50,7 +50,7 @@ export const getAllOrgs = async (req: Request, res: Response) => {
         email: true,
         name: true,
         totalDonation: true,
-        // Include other fields as needed
+        
       },
     });
     res.json(orgs);
@@ -58,3 +58,51 @@ export const getAllOrgs = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch organizations' });
   }
 };
+
+export const createPost = async (req: Request, res: Response) => {
+  const { title, content, orgId } = req.body;
+
+  try {
+    const post = await prisma.post.create({
+      data: {
+        title,
+        content,
+        publishedOn: new Date(),
+        publishedBy: 'org', 
+        orgId,
+      },
+    });
+    res.status(201).json(post);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create post' });
+  }
+};
+
+
+export const getAllPosts = async (req: Request, res: Response) => {
+  try {
+    const posts = await prisma.post.findMany({
+      include: {
+        org: true,
+      },
+    });
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch posts' });
+  }
+};
+export const getPostById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      const post = await prisma.post.findUnique({
+        where: { id: Number(id) },
+        include: {
+          org: true,
+        },
+      });
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch post' });
+    }
+  };
+  

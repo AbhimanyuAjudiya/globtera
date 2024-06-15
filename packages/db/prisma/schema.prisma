@@ -12,15 +12,8 @@ model User {
   email      String      @unique
   name       String
   password   String
-  wallets    UserWallet[]
+  walletAddress String 
   donations  Donation[]
-}
-
-model UserWallet {
-  id      Int    @id @default(autoincrement())
-  address String
-  userId  Int
-  user    User   @relation(fields: [userId], references: [id])
 }
 
 model Org {
@@ -29,16 +22,9 @@ model Org {
   totalDonation Float       @default(0)
   name          String
   password      String
-  wallets       OrgWallet[]
+  walletAddress String 
   posts         Post[]
   donations     Donation[]
-}
-
-model OrgWallet {
-  id      Int    @id @default(autoincrement())
-  address String
-  orgId   Int
-  org     Org    @relation(fields: [orgId], references: [id])
 }
 
 model Post {
