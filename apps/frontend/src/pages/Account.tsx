@@ -6,14 +6,14 @@ import { BACKEND_URL } from "../config";
 
 export const Account = () => {
   const [accountDetails, setAccountDetails] = useState<any>(null);
+  const [balance, setBalance] = useState<string | null>(null);
   const [isOrg, setIsOrg] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const userType = localStorage.getItem('userType');
     const token = localStorage.getItem('token');
-    console.log(token);
-    
+
     if (!token) {
       navigate("/signin");
       return;
@@ -36,10 +36,30 @@ export const Account = () => {
             }
           });
         }
-        setAccountDetails(response.data);
+        const accountData = response.data;
+        setAccountDetails(accountData);
+        
+        // Fetch the balance from the Stellar network
+        const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `https://horizon-testnet.stellar.org/accounts/${accountData.walletAddress}`,
+        headers: { 
+            'Accept': 'application/json'
+        }
+        };
+
+        axios.request(config)
+        .then((response) => {
+            setBalance(response.data.balances[0].balance);
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+
       } catch (error) {
         console.error("Failed to fetch account details", error);
-        navigate("/signin");
+        // navigate("/signin");
       }
     };
 
@@ -63,6 +83,7 @@ export const Account = () => {
         <p>Name: {accountDetails.name}</p>
         <p>Email: {accountDetails.email}</p>
         <p>Wallet Address: {accountDetails.walletAddress}</p>
+        <p>Balance: {balance !== null ? `${balance} XLM` : "Loading..."}</p>
         {isOrg && <p>Total Donations: {accountDetails.totalDonation}</p>}
       </div>
     </div>

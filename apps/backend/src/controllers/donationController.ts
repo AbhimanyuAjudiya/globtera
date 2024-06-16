@@ -1,43 +1,72 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-// import { donateToOrg } from '../utils/stellarUtils';
+import { Keypair, Horizon, TransactionBuilder, Networks, Operation, Asset, BASE_FEE, Memo } from 'stellar-sdk';
+
+// Stellar server instance
+const server = new Horizon.Server('https://horizon-testnet.stellar.org');
 
 const prisma = new PrismaClient();
 
-export const processDonation = async (req: Request, res: Response) => {
-  const { userId, orgId, amount } = req.body;
+export const donateToOrg = async (req: Request, res: Response) => {
+  const { userId, orgId, amount, secretKey } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    const org = await prisma.org.findUnique({ where: { id: orgId } });
+    // Retrieve the destination public key (organization's wallet address)
+    const org = await prisma.org.findUnique({
+      where: { id: orgId },
+    });
 
-    if (!user || !org) {
-      return res.status(404).json({ error: 'User or Organization not found' });
+    if (!org) {
+      return res.status(404).json({ error: 'Organization not found' });
     }
 
-    // Process the donation via Stellar
-    // await donateToOrg(org.walletAddress, amount);
+    const destinationPublicKey = org.walletAddress;
+
+    // Retrieve the source account
+    const sourceKeypair = Keypair.fromSecret(secretKey);
+    const sourceAccount = await server.loadAccount(sourceKeypair.publicKey());
+
+    // Create a transaction
+    const transaction = new TransactionBuilder(sourceAccount, {
+      fee: BASE_FEE,
+      networkPassphrase: Networks.TESTNET,
+    })
+      .addOperation(Operation.payment({
+        destination: destinationPublicKey,
+        asset: Asset.native(),
+        amount: amount.toString(),
+      }))
+      .addMemo(Memo.text(`Donation from user ${userId}`))
+      .setTimeout(30)
+      .build();
+
+    // Sign the transaction
+    transaction.sign(sourceKeypair);
+
+    // Submit the transaction
+    const transactionResult = await server.submitTransaction(transaction);
+
+    // Log the transaction result
+    console.log('Success! Results:', transactionResult);
 
     // Record the donation in the database
     const donation = await prisma.donation.create({
       data: {
-        amount,
         userId,
         orgId,
+        amount: parseFloat(amount),
       },
     });
 
-    // Update total donations for the organization
+    // Update the organization's total donation
     await prisma.org.update({
       where: { id: orgId },
-      data: {
-        totalDonation: { increment: amount },
-      },
+      data: { totalDonation: { increment: parseFloat(amount) } },
     });
 
-    res.status(200).json(donation);
+    res.status(201).json({ message: 'Donation successful', donation });
   } catch (error) {
-    console.error('Error processing donation:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Something went wrong!', error);
+    res.status(500).json({ error: 'Donation failed' });
   }
 };

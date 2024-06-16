@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { Request, Response } from 'express';
 import { generateToken } from '../utils/jwtUtils';
+import { Keypair } from '@stellar/stellar-sdk'
+import { fundStellarAccount } from '../utils/stellarUtils';
 
 const prisma = new PrismaClient();
 
@@ -10,17 +12,28 @@ export const registerOrg = async (req: Request, res: Response) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate Stellar keypair
+    const keypair = Keypair.random();
+    const publicKey = keypair.publicKey();
+    const secretKey = keypair.secret();
+
+    // Fund the Stellar account with test XLM
+    await fundStellarAccount(publicKey);
+
     const org = await prisma.org.create({
       data: {
         email,
         name,
         password: hashedPassword,
+        walletAddress: publicKey,
       },
     });
 
     const token = generateToken(org.id, org.email);
-    res.status(201).json({ token });
+    res.status(201).json({ token, secretKey, org });
   } catch (error) {
+    console.error('Organization registration error:', error);
     res.status(500).json({ error: 'Organization registration failed' });
   }
 };
@@ -33,7 +46,7 @@ export const authOrg = async (req: Request, res: Response) => {
 
     if (org && (await bcrypt.compare(password, org.password))) {
       const token = generateToken(org.id, org.email);
-      res.json({ token });
+      res.json({ token, org });
     } else {
       res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -107,9 +120,9 @@ export const getPostById = async (req: Request, res: Response) => {
   };
   
   export const getOrgDetails = async (req: Request, res: Response) => {
-    const orgId = req.user.id; // Assuming req.user is set by auth middleware
+    const orgId = req.user.id; 
   
-    console.log('Fetching details for org:', orgId); // Add logging
+    console.log('Fetching details for org:', orgId);
   
     try {
       const org = await prisma.org.findUnique({

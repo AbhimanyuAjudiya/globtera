@@ -13,7 +13,8 @@ export const Publish = () => {
         try {
             const response = await axios.post(`${BACKEND_URL}/org/post`, {
                 title,
-                content: description
+                content: description,
+                orgId: Number(localStorage.getItem("orgId"))
             }, {
                 headers: {
                     Authorization: `${localStorage.getItem("token")}`

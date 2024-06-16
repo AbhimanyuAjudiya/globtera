@@ -20,6 +20,8 @@ export const AppBar = () => {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userType');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('orgId');
         setIsLoggedIn(false);
         setIsOrg(false);
         navigate("/");

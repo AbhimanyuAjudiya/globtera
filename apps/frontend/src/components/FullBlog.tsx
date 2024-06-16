@@ -2,20 +2,23 @@ import { useState } from "react";
 import { Blog } from "../hooks";
 import { Avatar } from "./BlogCard";
 import axios from 'axios';
+import { BACKEND_URL } from "../config";
 
 export const FullBlog = ({ blog }: { blog: Blog }) => {
   const [donationAmount, setDonationAmount] = useState("");
+  const [secretKey, setSecretKey] = useState("");
   const [donationStatus, setDonationStatus] = useState("");
 
   const handleDonation = async () => {
     try {
       setDonationStatus("Processing...");
-      // Assuming userId is available in your context or state
-      const userId = 1; // Replace with actual user ID
-      await axios.post('/api/donate', {
+      const userId = Number(localStorage.getItem("userId")); 
+      await axios.post(`${BACKEND_URL}/donation/donate`, {
         userId,
+        // @ts-ignore
         orgId: blog.org.id,
         amount: parseFloat(donationAmount),
+        secretKey, 
       });
       setDonationStatus("Donation successful!");
     } catch (error) {
@@ -53,13 +56,20 @@ export const FullBlog = ({ blog }: { blog: Blog }) => {
             {blog.org.name || "Anonymous"}
           </div>
         </div>
-        <div className="mt-4">
+        {localStorage.getItem('userType') === "org" ? <></> :  <div className="mt-4">
           <input
             type="number"
             value={donationAmount}
             onChange={(e) => setDonationAmount(e.target.value)}
             placeholder="Enter donation amount"
             className="border rounded p-2"
+          />
+          <input
+            type="text"
+            value={secretKey}
+            onChange={(e) => setSecretKey(e.target.value)}
+            placeholder="Enter your secret key"
+            className="border rounded p-2 mt-2"
           />
           <button
             onClick={handleDonation}
@@ -68,7 +78,7 @@ export const FullBlog = ({ blog }: { blog: Blog }) => {
             Donate
           </button>
           {donationStatus && <div className="mt-2 text-sm">{donationStatus}</div>}
-        </div>
+        </div>}
       </div>
     </div>
   );

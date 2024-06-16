@@ -18,18 +18,28 @@ export const Auth = ({ type }: { type: "signin" | "signup" }) => {
         password: ""
     });
     const [accountType, setAccountType] = useState<"user" | "org">("user");
+    const [secretKey, setSecretKey] = useState<string | null>(null);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     async function sendReq() {
+        setIsProcessing(true);
         const endpoint = accountType === "org" ? '/org' : '/user';
         await axios.post(`${BACKEND_URL}${endpoint}${type === "signup" ? "/register" : "/auth"}`, postInputs)
             .then((res) => {
+                if (type === "signup") {
+                    setSecretKey(res.data.secretKey);
+                }
                 localStorage.setItem("token", res.data.token);
                 localStorage.setItem("userType", accountType);
-                navigate("/");
+                accountType === "org" ? localStorage.setItem("orgId", res.data.org.id) : localStorage.setItem("userId", res.data.user.id);
+                if (type === "signin") navigate("/");
             })
             .catch((e) => {
                 console.log(e);
                 alert("error");
+            })
+            .finally(() => {
+                setIsProcessing(false);
             });
     }
 
@@ -100,9 +110,18 @@ export const Auth = ({ type }: { type: "signin" | "signup" }) => {
                             type="button"
                             onClick={sendReq}
                             className="mt-8 text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center"
+                            disabled={isProcessing}
                         >
-                            {type === "signin" ? "Signin" : "Signup"}
+                            {type === "signin" ? "Signin" : isProcessing ? "Processing..." : "Signup"}
                         </button>
+                        {secretKey && (
+                            <div className="w-full mt-4 p-4 bg-yellow-200 text-yellow-800 rounded">
+                                <h2 className="font-bold">Secret Key</h2>
+                                <p>{secretKey}</p>
+                                <p className="text-sm">Please save this key securely. You will need it to make transactions.</p>
+                                <Link className="text-slate-400 pl-2 underline" to="/">Home</Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

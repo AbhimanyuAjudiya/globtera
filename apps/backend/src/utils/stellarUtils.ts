@@ -1,31 +1,16 @@
-// import StellarSdk from 'stellar-sdk';
+import fetch from 'node-fetch'; // Ensure you have installed node-fetch for making HTTP requests
 
-// const server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
-// const sourceSecretKey = process.env.STELLAR_SECRET_KEY; // Ensure this is set in your environment
-// const sourceKeypair = StellarSdk.Keypair.fromSecret(sourceSecretKey);
+const friendbotUrl = 'https://friendbot.stellar.org';
 
-// export const donateToOrg = async (destinationAddress: string, amount: number) => {
-//   try {
-//     const sourceAccount = await server.loadAccount(sourceKeypair.publicKey());
-
-//     const transaction = new StellarSdk.TransactionBuilder(sourceAccount, {
-//       fee: StellarSdk.BASE_FEE,
-//       networkPassphrase: StellarSdk.Networks.TESTNET,
-//     })
-//       .addOperation(StellarSdk.Operation.payment({
-//         destination: destinationAddress,
-//         asset: StellarSdk.Asset.native(),
-//         amount: amount.toString(),
-//       }))
-//       .setTimeout(30)
-//       .build();
-
-//     transaction.sign(sourceKeypair);
-//     const result = await server.submitTransaction(transaction);
-//     console.log('Transaction successful:', result);
-//     return result;
-//   } catch (error) {
-//     console.error('Error submitting transaction:', error);
-//     throw error;
-//   }
-// };
+export const fundStellarAccount = async (publicKey: string): Promise<void> => {
+  try {
+    const response = await fetch(`${friendbotUrl}?addr=${publicKey}`);
+    if (!response.ok) {
+      throw new Error('Failed to fund Stellar account with Friendbot');
+    }
+    console.log(`Successfully funded Stellar account ${publicKey} with test XLM`);
+  } catch (error) {
+    console.error('Error funding Stellar account:', error);
+    throw error;
+  }
+};

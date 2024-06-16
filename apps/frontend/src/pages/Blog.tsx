@@ -20,6 +20,7 @@ export function Blog() {
   return (
     <div>
       <AppBar />
+      {/* @ts-ignore */}
       <FullBlog blog={blog} />
     </div>
   );
