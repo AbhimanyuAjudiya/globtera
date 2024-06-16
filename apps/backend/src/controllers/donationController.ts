@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { donateToOrg } from '../utils/stellarUtils';
+// import { donateToOrg } from '../utils/stellarUtils';
 
 const prisma = new PrismaClient();
 
@@ -16,7 +16,7 @@ export const processDonation = async (req: Request, res: Response) => {
     }
 
     // Process the donation via Stellar
-    await donateToOrg(org.walletAddress, amount);
+    // await donateToOrg(org.walletAddress, amount);
 
     // Record the donation in the database
     const donation = await prisma.donation.create({

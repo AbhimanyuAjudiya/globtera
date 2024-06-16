@@ -1,18 +1,32 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../utils/jwtUtils';
+import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  
+const prisma = new PrismaClient();
+
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
   if (!token) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
+    return res.status(401).json({ message: 'No token provided' });
   }
 
   try {
-    const decoded = verifyToken(token);
-    (req as any).user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: number; email: string };
+    
+    let user = await prisma.user.findUnique({ where: { id: decoded.id } });
+    if (!user) {
+      user = await prisma.org.findUnique({ where: { id: decoded.id } });
+    }
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    req.user = user;
     next();
-  } catch (err) {
-    res.status(401).json({ message: 'Token is not valid' });
+  } catch (error) {
+    console.error('JWT verification failed:', error);
+    res.status(401).json({ message: 'Unauthorized' });
   }
 };

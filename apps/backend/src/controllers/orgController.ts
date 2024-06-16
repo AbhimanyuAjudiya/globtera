@@ -106,3 +106,26 @@ export const getPostById = async (req: Request, res: Response) => {
     }
   };
   
+  export const getOrgDetails = async (req: Request, res: Response) => {
+    const orgId = req.user.id; // Assuming req.user is set by auth middleware
+  
+    console.log('Fetching details for org:', orgId); // Add logging
+  
+    try {
+      const org = await prisma.org.findUnique({
+        where: { id: orgId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          walletAddress: true,
+          totalDonation: true,
+        },
+      });
+      res.json(org);
+    } catch (error) {
+      console.error('Error fetching org details:', error);
+      res.status(500).json({ error: 'Failed to fetch organization details' });
+    }
+  };
+  

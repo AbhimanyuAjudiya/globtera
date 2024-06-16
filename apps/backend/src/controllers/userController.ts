@@ -41,3 +41,25 @@ export const authUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'User authentication failed' });
   }
 };
+
+export const getUserDetails = async (req: Request, res: Response) => {
+  const userId = req.user.id; // Assuming req.user is set by auth middleware
+
+  console.log('Fetching details for user:', userId); // Add logging
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        walletAddress: true,
+      },
+    });
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ error: 'Failed to fetch user details' });
+  }
+};

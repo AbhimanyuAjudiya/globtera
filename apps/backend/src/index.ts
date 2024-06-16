@@ -3,7 +3,9 @@ import userRoutes from './routes/userRoutes';
 import orgRoutes from './routes/orgRoutes';
 import donationRoutes from './routes/donationRoutes';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
