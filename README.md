@@ -64,7 +64,7 @@ Installation
 
 
 ```
-git clone https://github.com/your-username/globtera.git cd globtera
+git clone https://github.com/AbhimanyuAjudiya/globtera.git cd globtera
 ```
 
 ### Backend Setup
