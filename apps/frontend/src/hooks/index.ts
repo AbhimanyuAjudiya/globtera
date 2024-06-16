@@ -8,6 +8,7 @@ export interface Blog {
   content: string;
   publishedOn: string;
   org: {
+    id: any;
     name: string;
   };
 }

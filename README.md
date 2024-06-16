@@ -1,81 +1,239 @@
-# Turborepo starter
+Globtera
+========
 
-This is an official starter Turborepo.
+Welcome to **Globtera**, a micro-donation platform that leverages the Stellar blockchain network to enable seamless, secure, and transparent donations. This README file will guide you through the project's architecture, setup instructions, and core functionalities.
 
-## Using this example
+Table of Contents
+-----------------
 
-Run the following command:
+*   [Introduction](#introduction)
+*   [Features](#features)
+*   [Technologies Used](#technologies-used)
+*   [Prerequisites](#prerequisites)
+*   [Installation](#installation)
+*   [Usage](#usage)
+*   [Stellar Integration](#stellar-integration)
+*   [Database Schema](#database-schema)
+*   [API Endpoints](#api-endpoints)
+*   [Contributing](#contributing)
+*   [License](#license)
 
-```sh
-npx create-turbo@latest
+Introduction
+------------
+
+Globtera is designed to facilitate micro-donations to various organizations and causes through a user-friendly interface. Users can sign up, view posts from organizations, and make donations directly through the platform using Stellar's blockchain technology.
+
+Features
+--------
+
+*   **User and Organization Management**: Separate interfaces and functionalities for users and organizations.
+*   **Stellar Blockchain Integration**: Secure and transparent transactions using Stellar's testnet.
+*   **Donation Tracking**: Track total donations received by organizations and individual donation records.
+*   **Secure Authentication**: User authentication and authorization using JWT.
+
+Technologies Used
+-----------------
+
+### Frontend
+
+*   **React**: JavaScript library for building user interfaces.
+*   **TypeScript**: Superset of JavaScript that adds static typing.
+*   **Tailwind CSS**: Utility-first CSS framework for rapid UI development.
+
+### Backend
+
+*   **Node.js**: JavaScript runtime built on Chrome's V8 JavaScript engine.
+*   **Express**: Fast, unopinionated, minimalist web framework for Node.js.
+*   **Prisma**: Next-generation ORM for Node.js and TypeScript.
+*   **PostgreSQL**: Open source relational database management system.
+*   **Stellar SDK**: JavaScript library for interacting with the Stellar blockchain.
+
+Prerequisites
+-------------
+
+Before you begin, ensure you have met the following requirements:
+
+*   **Node.js**: v14.x or later
+*   **npm**: v6.x or later
+*   **PostgreSQL**: v12.x or later
+*   **Stellar SDK**: Follow the [official documentation](https://stellar.github.io/js-stellar-sdk/index.html)
+
+Installation
+------------
+
+### Clone the Repository
+
+
+```
+git clone https://github.com/your-username/globtera.git cd globtera
 ```
 
-## What's inside?
+### Backend Setup
 
-This Turborepo includes the following packages/apps:
+1.  **Install Dependencies**:
+    
+    `cd backend npm install`
+    
+2.  **Environment Variables**:
+    
+    Create a `.env` file in the `backend` directory and configure the following environment variables:
+    
+    env
+    
+    Copy code
+    
+    `DATABASE_URL=postgresql://username:password@localhost:5432/globtera JWT_SECRET=your_jwt_secret`
+    
+3.  **Database Migration**:
+    
+    sh
+    
+    Copy code
+    
+    `npx prisma migrate dev --name init`
+    
+4.  **Start the Backend Server**:
+    
+    sh
+    
+    Copy code
+    
+    `npm run dev`
+    
 
-### Apps and Packages
+### Frontend Setup
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+1.  **Install Dependencies**:
+    
+    sh
+    
+    Copy code
+    
+    `cd frontend npm install`
+    
+2.  **Start the Frontend Server**:
+    
+    sh
+    
+    Copy code
+    
+    `npm start`
+    
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+Usage
+-----
 
-### Utilities
+### User Signup
 
-This Turborepo has some additional tools already setup for you:
+1.  **Create Account**:
+    
+    *   Users and organizations can sign up by providing their email, name, password, and other necessary details.
+    *   A wallet address will be automatically generated using the Stellar SDK and stored in the database.
+2.  **Login**:
+    
+    *   Users and organizations can log in using their email and password to receive a JWT token for authentication.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+### Making Donations
 
-### Build
+1.  **Browse Posts**:
+    
+    *   Users can view posts made by organizations, each detailing a cause or project that requires donations.
+2.  **Donate**:
+    
+    *   Users can donate to a post by entering the donation amount and their Stellar secret key.
+    *   The donation is processed on the Stellar testnet, and the transaction is recorded in the database.
 
-To build all apps and packages, run the following command:
+Stellar Integration
+-------------------
+
+### Account Creation
+
+We use the Stellar SDK to create new accounts and fund them via the friendbot for the testnet environment. This includes generating a public-private key pair and requesting initial funds.
+
+### Making Donations
+
+The donation process involves:
+
+1.  **Loading the Source Account**:
+    
+    *   Using the Stellar secret key to load the user's account.
+2.  **Creating a Transaction**:
+    
+    *   Building and signing a transaction to transfer the specified amount to the organization's wallet address.
+3.  **Submitting the Transaction**:
+    
+    *   Submitting the signed transaction to the Stellar testnet.
+
+Database Schema
+---------------
+
+We use Prisma to manage our PostgreSQL database schema. The schema includes models for `User`, `Org`, `Post`, and `Donation`.
 
 ```
-cd my-turborepo
-pnpm build
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+model User {
+  id         Int         @id @default(autoincrement())
+  email      String      @unique
+  name       String
+  password   String
+  walletAddress String
+  donations  Donation[]
+}
+
+model Org {
+  id            Int         @id @default(autoincrement())
+  email         String      @unique
+  totalDonation Float       @default(0)
+  name          String
+  password      String
+  walletAddress String
+  posts         Post[]
+  donations     Donation[]
+}
+
+model Post {
+  id            Int         @id @default(autoincrement())
+  title         String
+  content       String
+  publishedOn   DateTime
+  publishedBy   String
+  totalDonation Float       @default(0)
+  orgId         Int
+  org           Org         @relation(fields: [orgId], references: [id])
+  donations     Donation[]
+}
+
+model Donation {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  orgId     Int
+  org       Org      @relation(fields: [orgId], references: [id])
+  postId    Int?
+  post      Post?    @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now())
+}
+
 ```
 
-### Develop
+Contributing
+------------
 
-To develop all apps and packages, run the following command:
+Contributions are welcome! Please fork the repository and create a pull request with your changes.
 
-```
-cd my-turborepo
-pnpm dev
-```
+License
+-------
 
-### Remote Caching
+This project is licensed under the MIT License. See the LICENSE file for details.
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+* * *
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+Thank you for using Globtera! If you have any questions or need further assistance, please feel free to contact us.
