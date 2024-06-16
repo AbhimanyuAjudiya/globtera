@@ -78,25 +78,13 @@ git clone https://github.com/your-username/globtera.git cd globtera
     
     Create a `.env` file in the `backend` directory and configure the following environment variables:
     
-    env
-    
-    Copy code
-    
     `DATABASE_URL=postgresql://username:password@localhost:5432/globtera JWT_SECRET=your_jwt_secret`
     
 3.  **Database Migration**:
     
-    sh
-    
-    Copy code
-    
     `npx prisma migrate dev --name init`
     
 4.  **Start the Backend Server**:
-    
-    sh
-    
-    Copy code
     
     `npm run dev`
     
@@ -105,19 +93,11 @@ git clone https://github.com/your-username/globtera.git cd globtera
 
 1.  **Install Dependencies**:
     
-    sh
-    
-    Copy code
-    
     `cd frontend npm install`
     
 2.  **Start the Frontend Server**:
     
-    sh
-    
-    Copy code
-    
-    `npm start`
+    `npm run dev`
     
 
 Usage
