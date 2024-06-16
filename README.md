@@ -14,7 +14,6 @@ Table of Contents
 *   [Usage](#usage)
 *   [Stellar Integration](#stellar-integration)
 *   [Database Schema](#database-schema)
-*   [API Endpoints](#api-endpoints)
 *   [Contributing](#contributing)
 *   [License](#license)
 
@@ -111,7 +110,7 @@ Usage
     *   A wallet address will be automatically generated using the Stellar SDK and stored in the database.
 2.  **Login**:
     
-    *   Users and organizations can log in using their email and password to receive a JWT token for authentication.
+    *   Users and organizations can login using their email and password to receive a JWT token for authentication.
 
 ### Making Donations
 
@@ -216,4 +215,4 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 * * *
 
-Thank you for using Globtera! If you have any questions or need further assistance, please feel free to contact us.
+Thank you for using Globtera! If you have any questions or need further assistance, please feel free to contact me.
