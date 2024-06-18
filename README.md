@@ -80,7 +80,7 @@ git clone https://github.com/AbhimanyuAjudiya/globtera.git cd globtera
     Create a `.env` file in the `packages/db` directory and configure the following environment variables:
     
     ```
-    DATABASE_URL=postgresql://username:password@localhost:5432/globtera JWT_SECRET=your_jwt_secret
+    DATABASE_URL=postgresql://username:password@localhost:5432/globtera
     ```
     
 3.  **Database Migration**:
