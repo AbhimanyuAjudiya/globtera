@@ -7,7 +7,6 @@ import { BACKEND_URL } from "../config";
 export const Account = () => {
   const [accountDetails, setAccountDetails] = useState<any>(null);
   const [balance, setBalance] = useState<string | null>(null);
-  const [isOrg, setIsOrg] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,7 +22,6 @@ export const Account = () => {
       try {
         let response;
         if (userType === 'org') {
-          setIsOrg(true);
           response = await axios.get(`${BACKEND_URL}/org/details`, {
             headers: {
               Authorization: `Bearer ${token}`
@@ -84,7 +82,6 @@ export const Account = () => {
         <p>Email: {accountDetails.email}</p>
         <p>Wallet Address: {accountDetails.walletAddress}</p>
         <p>Balance: {balance !== null ? `${balance} XLM` : "Loading..."}</p>
-        {isOrg && <p>Total Donations: {accountDetails.totalDonation}</p>}
       </div>
     </div>
   );
