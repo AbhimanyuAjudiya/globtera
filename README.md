@@ -82,7 +82,20 @@ git clone https://github.com/AbhimanyuAjudiya/globtera.git cd globtera
     ```
     DATABASE_URL=postgresql://username:password@localhost:5432/globtera
     ```
-    
+    If you want to get quick db url then run the following command to start a PostgreSQL database in a Docker container:
+
+    ```
+        docker run -p 5432:5432 -d \
+        -e POSTGRES_PASSWORD=postgres \
+        -e POSTGRES_USER=postgres \
+        -e POSTGRES_DB=globtera \
+        -v pgdata:/var/lib/postgresql/data \
+        postgres
+      ```
+      After running last command use this url for db:
+      ```
+      DATABASE_URL=postgresql://postgres:postgres@localhost:5432/globtera
+      ```
 3.  **Database Migration**:
     
     ```
