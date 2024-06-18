@@ -67,36 +67,35 @@ Installation
 git clone https://github.com/AbhimanyuAjudiya/globtera.git cd globtera
 ```
 
-### Backend Setup
+### App Setup
 
 1.  **Install Dependencies**:
     
-    `cd backend npm install`
+    ```
+    npm install
+    ```
     
 2.  **Environment Variables**:
     
-    Create a `.env` file in the `backend` directory and configure the following environment variables:
+    Create a `.env` file in the `packages/db` directory and configure the following environment variables:
     
-    `DATABASE_URL=postgresql://username:password@localhost:5432/globtera JWT_SECRET=your_jwt_secret`
+    ```
+    DATABASE_URL=postgresql://username:password@localhost:5432/globtera JWT_SECRET=your_jwt_secret
+    ```
     
 3.  **Database Migration**:
     
-    `npx prisma migrate dev --name init`
+    ```
+    npx prisma migrate dev --name init
+    ```
     
-4.  **Start the Backend Server**:
+4.  **Start the app**:
     
-    `npm run dev`
+    ```
+    npm run dev
+    ```
     
 
-### Frontend Setup
-
-1.  **Install Dependencies**:
-    
-    `cd frontend npm install`
-    
-2.  **Start the Frontend Server**:
-    
-    `npm run dev`
     
 
 Usage
@@ -108,6 +107,8 @@ Usage
     
     *   Users and organizations can sign up by providing their email, name, password, and other necessary details.
     *   A wallet address will be automatically generated using the Stellar SDK and stored in the database.
+    *   Dont't forget to store secret key provided while signing up keep it secure.
+    *   Also 10000 XLM will be automatically added to the wallet for simplicity.
 2.  **Login**:
     
     *   Users and organizations can login using their email and password to receive a JWT token for authentication.
