@@ -3,6 +3,8 @@ Globtera
 
 Welcome to **Globtera**, a micro-donation platform that leverages the Stellar blockchain network to enable seamless, secure, and transparent donations. This README file will guide you through the project's architecture, setup instructions, and core functionalities.
 
+This project won me a hackathon!!! https://x.com/onboardingclub/status/1803505236499374153
+
 Table of Contents
 -----------------
 
