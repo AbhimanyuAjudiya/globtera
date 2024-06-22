@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { Keypair, Horizon, TransactionBuilder, Networks, Operation, Asset, BASE_FEE, Memo } from 'stellar-sdk';
 
-// Stellar server instance
 const server = new Horizon.Server('https://horizon-testnet.stellar.org');
 
 const prisma = new PrismaClient();
@@ -11,7 +10,6 @@ export const donateToOrg = async (req: Request, res: Response) => {
   const { userId, orgId, amount, secretKey } = req.body;
 
   try {
-    // Retrieve the destination public key (organization's wallet address)
     const org = await prisma.org.findUnique({
       where: { id: orgId },
     });
@@ -22,11 +20,9 @@ export const donateToOrg = async (req: Request, res: Response) => {
 
     const destinationPublicKey = org.walletAddress;
 
-    // Retrieve the source account
     const sourceKeypair = Keypair.fromSecret(secretKey);
     const sourceAccount = await server.loadAccount(sourceKeypair.publicKey());
 
-    // Create a transaction
     const transaction = new TransactionBuilder(sourceAccount, {
       fee: BASE_FEE,
       networkPassphrase: Networks.TESTNET,
@@ -40,16 +36,12 @@ export const donateToOrg = async (req: Request, res: Response) => {
       .setTimeout(30)
       .build();
 
-    // Sign the transaction
     transaction.sign(sourceKeypair);
 
-    // Submit the transaction
     const transactionResult = await server.submitTransaction(transaction);
 
-    // Log the transaction result
     console.log('Success! Results:', transactionResult);
 
-    // Record the donation in the database
     const donation = await prisma.donation.create({
       data: {
         userId,
@@ -58,7 +50,6 @@ export const donateToOrg = async (req: Request, res: Response) => {
       },
     });
 
-    // Update the organization's total donation
     await prisma.org.update({
       where: { id: orgId },
       data: { totalDonation: { increment: parseFloat(amount) } },

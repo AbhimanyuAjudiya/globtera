@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'; // Ensure you have installed node-fetch for making HTTP requests
+import fetch from 'node-fetch'; 
 
 const friendbotUrl = 'https://friendbot.stellar.org';
 

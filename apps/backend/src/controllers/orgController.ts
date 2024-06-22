@@ -13,12 +13,10 @@ export const registerOrg = async (req: Request, res: Response) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate Stellar keypair
     const keypair = Keypair.random();
     const publicKey = keypair.publicKey();
     const secretKey = keypair.secret();
 
-    // Fund the Stellar account with test XLM
     await fundStellarAccount(publicKey);
 
     const org = await prisma.org.create({

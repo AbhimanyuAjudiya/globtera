@@ -13,12 +13,10 @@ export const registerUser = async (req: Request, res: Response) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate Stellar keypair
     const keypair = Keypair.random();
     const publicKey = keypair.publicKey();
     const secretKey = keypair.secret();
 
-    // Fund the Stellar account with test XLM
     await fundStellarAccount(publicKey);
 
     const user = await prisma.user.create({
@@ -56,9 +54,9 @@ export const authUser = async (req: Request, res: Response) => {
 };
 
 export const getUserDetails = async (req: Request, res: Response) => {
-  const userId = req.user.id; // Assuming req.user is set by auth middleware
+  const userId = req.user.id;
 
-  console.log('Fetching details for user:', userId); // Add logging
+  console.log('Fetching details for user:', userId); 
 
   try {
     const user = await prisma.user.findUnique({
