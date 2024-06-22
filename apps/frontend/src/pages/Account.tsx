@@ -37,7 +37,6 @@ export const Account = () => {
         const accountData = response.data;
         setAccountDetails(accountData);
         
-        // Fetch the balance from the Stellar network
         const config = {
         method: 'get',
         maxBodyLength: Infinity,

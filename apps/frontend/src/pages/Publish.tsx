@@ -23,7 +23,6 @@ export const Publish = () => {
             navigate(`/blog/${response.data.id}`);
         } catch (error) {
             console.error("Failed to publish post", error);
-            // Add error handling logic here
         }
     };
 

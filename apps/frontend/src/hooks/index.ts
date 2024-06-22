@@ -46,14 +46,14 @@ export const useBlogs = () => {
             }
         })
         .then(res => {
-            setBlogs(res.data); // Assuming backend response is { blogs: [...] }
+            setBlogs(res.data); 
             setLoading(false);
         })
         .catch(error => {
             console.error("Failed to fetch blogs", error);
-            setLoading(false); // Ensure loading state is set to false on error
+            setLoading(false); 
         });
-    }, []); // Empty dependency array ensures the effect runs once
+    }, []); 
 
     return {
         loading,
