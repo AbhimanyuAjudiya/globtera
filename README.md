@@ -35,7 +35,7 @@ Technologies Used
 
 ### Frontend
 
-*   **React**: JavaScript library for building user interfaces.
+*   **React**: Script library for building user interfaces.
 *   **TypeScript**: Superset of JavaScript that adds static typing.
 *   **Tailwind CSS**: Utility-first CSS framework for rapid UI development.
 
